@@ -23,6 +23,42 @@ export interface BondParams {
     coupon: number;
     maturity: number;
     currentRate: number;
+    faceValue: number;
+}
+
+/**
+ * Parámetros de mercado
+ */
+export interface MarketParams {
+    riskFreeRate: number;
+    simulatedRate: number;
+}
+
+/**
+ * Parámetros de costes
+ */
+export interface CostParams {
+    spreadPercent: number;
+    commissionPercent: number;
+    commissionFixed: number;
+}
+
+/**
+ * Parámetros de tiempo
+ */
+export interface TimeParams {
+    elapsedDays: number;
+}
+
+/**
+ * Entrada completa del simulador (para provisioning JSON)
+ */
+export interface SimulatorInput {
+    warrant: WarrantParams;
+    bond: BondParams;
+    market: MarketParams;
+    costs: CostParams;
+    time: TimeParams;
 }
 
 /**
@@ -41,6 +77,37 @@ export interface Calculations {
     profitLossPercent: number;
     duration: number;
     priceChange: number;
+}
+
+/**
+ * Resultado de costes
+ */
+export interface CostsResult {
+    spreadCost: number;
+    commission: number;
+    totalCosts: number;
+    grossInvestment: number;
+    netInvestment: number;
+}
+
+/**
+ * Salida completa del simulador (para export JSON)
+ */
+export interface SimulatorOutput {
+    input: SimulatorInput;
+    calculations: Calculations;
+    costs: CostsResult;
+    theta: number;
+    breakEvenRate: number | null;
+    adjustedPnL: {
+        totalInvestment: number;
+        simulatedPosition: number;
+        profitLoss: number;
+        profitLossPercent: number;
+    };
+    remainingDays: number;
+    remainingYears: number;
+    timestamp: string;
 }
 
 /**

@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
-import type { WarrantType } from './lib/types';
+import type { WarrantType, SimulatorInput, SimulatorOutput } from './lib/types';
+import { runSimulation } from './lib/simulator';
 import {
     useWarrantCalculations,
     usePayoffData,
@@ -58,7 +59,40 @@ export default function App() {
     const totalDays = Math.round(expiry * 365);
     const remainingYears = Math.max(0, (totalDays - elapsedDays) / 365);
 
-    // Hooks
+    // Build input for export
+    const currentInput: SimulatorInput = useMemo(() => ({
+        warrant: { type: warrantType, strike, premium, ratio, expiry, volatility, quantity },
+        bond: { coupon: bondCoupon, maturity: bondMaturity, currentRate, faceValue },
+        market: { riskFreeRate, simulatedRate },
+        costs: { spreadPercent, commissionPercent, commissionFixed },
+        time: { elapsedDays },
+    }), [warrantType, strike, premium, ratio, expiry, volatility, quantity, bondCoupon, bondMaturity, currentRate, faceValue, riskFreeRate, simulatedRate, spreadPercent, commissionPercent, commissionFixed, elapsedDays]);
+
+    // Run simulation for export
+    const currentOutput: SimulatorOutput = useMemo(() => runSimulation(currentInput), [currentInput]);
+
+    // Import handler
+    const handleImport = useCallback((input: SimulatorInput) => {
+        setWarrantType(input.warrant.type);
+        setStrike(input.warrant.strike);
+        setPremium(input.warrant.premium);
+        setRatio(input.warrant.ratio);
+        setExpiry(input.warrant.expiry);
+        setVolatility(input.warrant.volatility);
+        setQuantity(input.warrant.quantity);
+        setBondCoupon(input.bond.coupon);
+        setBondMaturity(input.bond.maturity);
+        setCurrentRate(input.bond.currentRate);
+        setFaceValue(input.bond.faceValue);
+        setRiskFreeRate(input.market.riskFreeRate);
+        setSimulatedRate(input.market.simulatedRate);
+        setSpreadPercent(input.costs.spreadPercent);
+        setCommissionPercent(input.costs.commissionPercent);
+        setCommissionFixed(input.costs.commissionFixed);
+        setElapsedDays(input.time.elapsedDays);
+    }, []);
+
+    // Hooks (for UI reactivity)
     const costs = useCosts({
         premium, quantity, ratio, spreadPercent, commissionPercent, commissionFixed,
     });
@@ -101,7 +135,12 @@ export default function App() {
             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
 
             <div className="relative max-w-7xl mx-auto">
-                <Header warrantType={warrantType} />
+                <Header
+                    warrantType={warrantType}
+                    currentInput={currentInput}
+                    currentOutput={currentOutput}
+                    onImport={handleImport}
+                />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Panel de configuración */}
