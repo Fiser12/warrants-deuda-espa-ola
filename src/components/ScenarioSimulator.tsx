@@ -27,6 +27,7 @@ export const ScenarioSimulator = ({ simulatedRate, currentRate, onChange }: Scen
                     step={0.1}
                     onChange={onChange}
                     sliderClass="!bg-gradient-to-r !from-green-500 !via-amber-500 !to-red-500"
+                    tooltip="Arrastra para simular diferentes escenarios de tipos de interés. Verde = tipos bajan (bueno para CALL). Rojo = tipos suben (bueno para PUT)."
                 />
                 <div className="flex justify-between mt-1 text-[11px] text-slate-500">
                     <span>1%</span>

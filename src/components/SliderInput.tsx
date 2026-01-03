@@ -12,6 +12,7 @@ interface SliderInputProps {
     colorClass?: string;
     sliderClass?: string;
     unit?: string;
+    tooltip?: string;
 }
 
 export const SliderInput = ({
@@ -26,9 +27,11 @@ export const SliderInput = ({
     colorClass = 'text-blue-400',
     sliderClass = '',
     unit = '',
+    tooltip,
 }: SliderInputProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [inputValue, setInputValue] = useState(String(value));
+    const [showTooltip, setShowTooltip] = useState(false);
 
     useEffect(() => {
         if (!isEditing) {
@@ -53,7 +56,6 @@ export const SliderInput = ({
         }
 
         if (!isNaN(parsed)) {
-            // Redondear al step más cercano pero SIN limitar al min/max
             const stepped = Math.round(parsed / step) * step;
             onChange(stepped);
         }
@@ -69,15 +71,35 @@ export const SliderInput = ({
         }
     };
 
-    // El slider se limita a su rango, pero el valor mostrado puede estar fuera
     const sliderValue = Math.min(max, Math.max(min, value));
     const isOutOfRange = value < min || value > max;
 
     return (
         <div>
             {label && (
-                <div className="flex justify-between mb-2">
-                    <label className="text-xs text-slate-500">{label}</label>
+                <div className="flex justify-between mb-2 items-center">
+                    <div className="flex items-center gap-1.5">
+                        <label className="text-xs text-slate-500">{label}</label>
+                        {tooltip && (
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    className="w-4 h-4 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-400 hover:text-slate-200 text-[10px] font-bold flex items-center justify-center transition-colors"
+                                    onMouseEnter={() => setShowTooltip(true)}
+                                    onMouseLeave={() => setShowTooltip(false)}
+                                    onClick={() => setShowTooltip(!showTooltip)}
+                                >
+                                    ?
+                                </button>
+                                {showTooltip && (
+                                    <div className="absolute left-6 top-1/2 -translate-y-1/2 z-50 w-64 p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-xl text-xs text-slate-300 leading-relaxed">
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-slate-800 border-l border-b border-slate-600 rotate-45" />
+                                        {tooltip}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                     {isEditing ? (
                         <input
                             type="text"

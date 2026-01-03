@@ -22,11 +22,9 @@ export const MarketParamsCard = ({
                     onChange={onRiskFreeRateChange}
                     formatValue={(v) => `${v.toFixed(2)}%`}
                     colorClass="text-emerald-400"
+                    tooltip="Tasa de referencia del BCE para descontar flujos futuros en Black-Scholes. Representa el coste de oportunidad de invertir en activos sin riesgo."
                 />
             </div>
-            <p className="mt-3 text-xs text-slate-500">
-                💡 Tasa de depósito del BCE. Usada para el descuento en Black-Scholes.
-            </p>
         </div>
     );
 };
