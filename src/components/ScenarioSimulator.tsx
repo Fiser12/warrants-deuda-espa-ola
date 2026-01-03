@@ -6,30 +6,16 @@ interface ScenarioSimulatorProps {
     onChange: (value: number) => void;
 }
 
-export const ScenarioSimulator = ({
-    simulatedRate,
-    currentRate,
-    onChange,
-}: ScenarioSimulatorProps) => {
-    const rateDirection = simulatedRate > currentRate
-        ? '▲ SUBEN'
-        : simulatedRate < currentRate
-            ? '▼ BAJAN'
-            : '= IGUAL';
+export const ScenarioSimulator = ({ simulatedRate, currentRate, onChange }: ScenarioSimulatorProps) => {
+    const rateDirection = simulatedRate > currentRate ? '▲ SUBEN' : simulatedRate < currentRate ? '▼ BAJAN' : '= IGUAL';
 
     return (
-        <div className="card" style={{ borderColor: 'rgba(234, 179, 8, 0.3)' }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: '14px', color: '#fbbf24', letterSpacing: '1px' }}>
-                ⚡ SIMULADOR DE ESCENARIO
-            </h3>
+        <div className="rounded-xl p-5 backdrop-blur-sm transition-all duration-300 bg-gradient-to-br from-slate-800/80 to-slate-900/90 border border-amber-500/30 hover:border-amber-500/50 hover:shadow-[0_8px_32px_rgba(234,179,8,0.1)]">
+            <h3 className="m-0 mb-4 text-sm text-amber-400 tracking-wide">⚡ SIMULADOR DE ESCENARIO</h3>
             <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <label style={{ fontSize: '12px', color: '#64748b' }}>Tipo de interés simulado</label>
-                    <span style={{
-                        fontSize: '20px',
-                        fontWeight: '700',
-                        color: simulatedRate > currentRate ? '#ef4444' : '#22c55e'
-                    }}>
+                <div className="flex justify-between mb-2">
+                    <label className="text-xs text-slate-500">Tipo de interés simulado</label>
+                    <span className={`text-xl font-bold ${simulatedRate > currentRate ? 'text-red-500' : 'text-green-500'}`}>
                         {simulatedRate.toFixed(2)}%
                     </span>
                 </div>
@@ -40,11 +26,9 @@ export const ScenarioSimulator = ({
                     max={7}
                     step={0.1}
                     onChange={onChange}
-                    style={{
-                        background: 'linear-gradient(90deg, #22c55e 0%, #eab308 50%, #ef4444 100%)'
-                    }}
+                    style={{ background: 'linear-gradient(90deg, #22c55e 0%, #eab308 50%, #ef4444 100%)' }}
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: '11px', color: '#64748b' }}>
+                <div className="flex justify-between mt-1 text-[11px] text-slate-500">
                     <span>1%</span>
                     <span>Tipos {rateDirection}</span>
                     <span>7%</span>

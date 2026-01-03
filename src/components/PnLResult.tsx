@@ -7,62 +7,36 @@ interface PnLResultProps {
     profitLossPercent: number;
 }
 
-export const PnLResult = ({
-    totalInvestment,
-    simulatedPosition,
-    profitLoss,
-    profitLossPercent,
-}: PnLResultProps) => {
+export const PnLResult = ({ totalInvestment, simulatedPosition, profitLoss, profitLossPercent }: PnLResultProps) => {
     const isProfit = profitLoss >= 0;
 
     return (
-        <div className="card" style={{
-            borderColor: isProfit ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.4)',
-            background: isProfit
-                ? 'linear-gradient(145deg, rgba(34, 197, 94, 0.1) 0%, rgba(15, 23, 42, 0.9) 100%)'
-                : 'linear-gradient(145deg, rgba(239, 68, 68, 0.1) 0%, rgba(15, 23, 42, 0.9) 100%)'
-        }}>
-            <h3 style={{ margin: '0 0 20px', fontSize: '14px', color: '#94a3b8', letterSpacing: '1px' }}>
-                📊 RESULTADO DE LA OPERACIÓN
-            </h3>
+        <div className={`rounded-xl p-5 ${isProfit
+            ? 'bg-gradient-to-br from-green-500/10 to-slate-900/90 border border-green-500/40'
+            : 'bg-gradient-to-br from-red-500/10 to-slate-900/90 border border-red-500/40'}`}
+        >
+            <h3 className="m-0 mb-5 text-sm text-slate-400 tracking-wide">📊 RESULTADO DE LA OPERACIÓN</h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px' }}>INVERSIÓN TOTAL</div>
-                    <div style={{ fontSize: '18px', fontWeight: '600', color: '#94a3b8' }}>
-                        {formatCurrency(totalInvestment)}
-                    </div>
+                    <div className="text-[11px] text-slate-500 mb-1">INVERSIÓN TOTAL</div>
+                    <div className="text-lg font-semibold text-slate-400">{formatCurrency(totalInvestment)}</div>
                 </div>
                 <div>
-                    <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px' }}>VALOR POSICIÓN</div>
-                    <div style={{ fontSize: '18px', fontWeight: '600', color: '#60a5fa' }}>
-                        {formatCurrency(simulatedPosition)}
-                    </div>
+                    <div className="text-[11px] text-slate-500 mb-1">VALOR POSICIÓN</div>
+                    <div className="text-lg font-semibold text-blue-400">{formatCurrency(simulatedPosition)}</div>
                 </div>
             </div>
 
-            <div style={{
-                marginTop: '20px',
-                padding: '20px',
-                background: 'rgba(0,0,0,0.3)',
-                borderRadius: '8px',
-                textAlign: 'center'
-            }}>
-                <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '8px' }}>BENEFICIO / PÉRDIDA</div>
-                <div style={{
-                    fontSize: '36px',
-                    fontWeight: '700',
-                    color: isProfit ? '#22c55e' : '#ef4444',
-                    textShadow: isProfit ? '0 0 20px rgba(34, 197, 94, 0.5)' : '0 0 20px rgba(239, 68, 68, 0.5)'
-                }}>
+            <div className="mt-5 p-5 bg-black/30 rounded-lg text-center">
+                <div className="text-[11px] text-slate-500 mb-2">BENEFICIO / PÉRDIDA</div>
+                <div
+                    className={`text-4xl font-bold ${isProfit ? 'text-green-500' : 'text-red-500'}`}
+                    style={{ textShadow: isProfit ? '0 0 20px rgba(34, 197, 94, 0.5)' : '0 0 20px rgba(239, 68, 68, 0.5)' }}
+                >
                     {isProfit ? '+' : ''}{formatCurrency(profitLoss)}
                 </div>
-                <div style={{
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    color: isProfit ? '#22c55e' : '#ef4444',
-                    marginTop: '4px'
-                }}>
+                <div className={`text-base font-semibold mt-1 ${isProfit ? 'text-green-500' : 'text-red-500'}`}>
                     ({profitLossPercent >= 0 ? '+' : ''}{profitLossPercent.toFixed(1)}%)
                 </div>
             </div>

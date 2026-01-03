@@ -6,37 +6,18 @@ interface HeaderProps {
 
 export const Header = ({ warrantType }: HeaderProps) => {
     return (
-        <header style={{
-            position: 'relative',
-            marginBottom: '32px',
-            borderBottom: '1px solid rgba(59, 130, 246, 0.2)',
-            paddingBottom: '20px'
-        }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
-                <div style={{
-                    width: '12px',
-                    height: '12px',
-                    background: '#22c55e',
-                    borderRadius: '50%',
-                    boxShadow: '0 0 12px #22c55e',
-                    animation: 'pulse 2s infinite'
-                }} />
-                <span style={{ color: '#64748b', fontSize: '12px', letterSpacing: '2px' }}>
-                    LIVE SIMULATION
-                </span>
+        <header className="relative mb-8 pb-5 border-b border-blue-500/20">
+            <div className="flex items-center gap-4 mb-2">
+                <div
+                    className="w-3 h-3 bg-green-500 rounded-full"
+                    style={{ boxShadow: '0 0 12px #22c55e', animation: 'pulse-glow 2s infinite' }}
+                />
+                <span className="text-slate-500 text-xs tracking-[2px]">LIVE SIMULATION</span>
             </div>
-            <h1 style={{
-                fontSize: '28px',
-                fontWeight: '700',
-                background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                margin: 0,
-                letterSpacing: '-0.5px'
-            }}>
+            <h1 className="text-[28px] font-bold m-0 tracking-tight bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 WARRANT SIMULATOR
             </h1>
-            <p style={{ color: '#64748b', margin: '8px 0 0', fontSize: '13px' }}>
+            <p className="text-slate-500 mt-2 text-[13px]">
                 Deuda Soberana España · Bonos del Estado · {warrantType === 'PUT' ? 'Posición Bajista' : 'Posición Alcista'}
             </p>
         </header>

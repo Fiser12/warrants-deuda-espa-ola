@@ -7,24 +7,14 @@ export const BondMetrics = ({ currentBondPrice, simulatedBondPrice }: BondMetric
     const priceDropped = simulatedBondPrice < currentBondPrice;
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div className="metric-card">
-                <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px' }}>
-                    PRECIO BONO ACTUAL
-                </div>
-                <div style={{ fontSize: '22px', fontWeight: '700', color: '#60a5fa' }}>
-                    {currentBondPrice.toFixed(2)}€
-                </div>
+        <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg p-4 bg-gradient-to-br from-slate-800/60 to-slate-900/70 border border-slate-600/20">
+                <div className="text-[11px] text-slate-500 mb-1">PRECIO BONO ACTUAL</div>
+                <div className="text-[22px] font-bold text-blue-400">{currentBondPrice.toFixed(2)}€</div>
             </div>
-            <div className="metric-card">
-                <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px' }}>
-                    PRECIO BONO SIMULADO
-                </div>
-                <div style={{
-                    fontSize: '22px',
-                    fontWeight: '700',
-                    color: priceDropped ? '#ef4444' : '#22c55e'
-                }}>
+            <div className="rounded-lg p-4 bg-gradient-to-br from-slate-800/60 to-slate-900/70 border border-slate-600/20">
+                <div className="text-[11px] text-slate-500 mb-1">PRECIO BONO SIMULADO</div>
+                <div className={`text-[22px] font-bold ${priceDropped ? 'text-red-500' : 'text-green-500'}`}>
                     {simulatedBondPrice.toFixed(2)}€
                 </div>
             </div>
