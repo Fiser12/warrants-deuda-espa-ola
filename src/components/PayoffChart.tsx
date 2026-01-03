@@ -9,6 +9,23 @@ interface PayoffChartProps {
     currentRate: number;
 }
 
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{ value: number }>;
+    label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+    if (!active || !payload?.length) return null;
+
+    return (
+        <div className="bg-slate-900/95 border border-blue-500/30 rounded-lg p-3 text-xs">
+            <p className="text-slate-400 mb-1">Tipo: {label}%</p>
+            <p className="text-blue-400 font-semibold">P&L: {formatCurrency(payload[0].value)}</p>
+        </div>
+    );
+};
+
 export const PayoffChart = ({ data, currentRate }: PayoffChartProps) => {
     return (
         <div className="rounded-xl p-5 backdrop-blur-sm transition-all duration-300 bg-gradient-to-br from-slate-800/80 to-slate-900/90 border border-blue-500/15 hover:border-blue-500/30 hover:shadow-[0_8px_32px_rgba(59,130,246,0.1)]">
@@ -25,11 +42,7 @@ export const PayoffChart = ({ data, currentRate }: PayoffChartProps) => {
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(100, 116, 139, 0.2)" />
                         <XAxis dataKey="rate" stroke="#64748b" fontSize={11} tickFormatter={(v: string) => `${v}%`} />
                         <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
-                        <Tooltip
-                            contentStyle={{ background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '8px', fontSize: '12px' }}
-                            formatter={(value: number) => [formatCurrency(value), 'P&L']}
-                            labelFormatter={(label: string) => `Tipo: ${label}%`}
-                        />
+                        <Tooltip content={<CustomTooltip />} />
                         <ReferenceLine y={0} stroke="#64748b" strokeDasharray="5 5" />
                         <ReferenceLine x={currentRate.toFixed(2)} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: 'Actual', fill: '#f59e0b', fontSize: 10 }} />
                         <Area type="monotone" dataKey="pnl" stroke="#3b82f6" strokeWidth={2} fill="url(#positiveGradient)" />

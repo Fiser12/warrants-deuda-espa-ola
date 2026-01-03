@@ -26,7 +26,7 @@ export const ScenarioSimulator = ({ simulatedRate, currentRate, onChange }: Scen
                     max={7}
                     step={0.1}
                     onChange={onChange}
-                    style={{ background: 'linear-gradient(90deg, #22c55e 0%, #eab308 50%, #ef4444 100%)' }}
+                    sliderClass="!bg-gradient-to-r !from-green-500 !via-amber-500 !to-red-500"
                 />
                 <div className="flex justify-between mt-1 text-[11px] text-slate-500">
                     <span>1%</span>

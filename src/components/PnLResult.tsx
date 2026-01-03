@@ -30,10 +30,7 @@ export const PnLResult = ({ totalInvestment, simulatedPosition, profitLoss, prof
 
             <div className="mt-5 p-5 bg-black/30 rounded-lg text-center">
                 <div className="text-[11px] text-slate-500 mb-2">BENEFICIO / PÉRDIDA</div>
-                <div
-                    className={`text-4xl font-bold ${isProfit ? 'text-green-500' : 'text-red-500'}`}
-                    style={{ textShadow: isProfit ? '0 0 20px rgba(34, 197, 94, 0.5)' : '0 0 20px rgba(239, 68, 68, 0.5)' }}
-                >
+                <div className={`text-4xl font-bold ${isProfit ? 'text-green-500 drop-shadow-[0_0_20px_rgba(34,197,94,0.5)]' : 'text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]'}`}>
                     {isProfit ? '+' : ''}{formatCurrency(profitLoss)}
                 </div>
                 <div className={`text-base font-semibold mt-1 ${isProfit ? 'text-green-500' : 'text-red-500'}`}>

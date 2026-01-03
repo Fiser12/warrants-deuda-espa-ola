@@ -40,13 +40,7 @@ export default function App() {
     return (
         <div className="min-h-screen p-6 relative overflow-hidden font-mono text-slate-200 bg-gradient-to-br from-[#0a0e17] via-[#121a2d] to-[#0d1321]">
             {/* Grid pattern overlay */}
-            <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                    backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px)',
-                    backgroundSize: '50px 50px'
-                }}
-            />
+            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
 
             <div className="relative">
                 <Header warrantType={warrantType} />
