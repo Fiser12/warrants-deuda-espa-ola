@@ -4,3 +4,4 @@ export { useTimeDecayData } from './useTimeDecayData';
 export { useCosts } from './useCosts';
 export { useTheta } from './useTheta';
 export { useBreakEven } from './useBreakEven';
+export { useSavedOperations } from './useSavedOperations';

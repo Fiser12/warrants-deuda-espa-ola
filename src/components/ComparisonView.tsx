@@ -1,0 +1,222 @@
+import { useMemo } from 'react';
+import {
+    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, ReferenceLine, Legend,
+} from 'recharts';
+import { formatCurrency } from '../lib/formatters';
+import type { SavedOperation } from '../lib/types';
+import { runSimulation } from '../lib/simulator';
+
+// Generate distinct colors for lines
+const COLORS = [
+    '#3b82f6', // blue
+    '#ef4444', // red
+    '#22c55e', // green
+    '#f59e0b', // amber
+    '#a855f7', // purple
+    '#ec4899', // pink
+    '#06b6d4', // cyan
+];
+
+interface ComparisonViewProps {
+    operations: SavedOperation[];
+    onClose: () => void;
+}
+
+export const ComparisonView = ({ operations, onClose }: ComparisonViewProps) => {
+
+    // Calcular resultados para cada operación
+    const results = useMemo(() => {
+        return operations.map(op => {
+            const result = runSimulation(op.input);
+            return {
+                ...op,
+                result
+            };
+        });
+    }, [operations]);
+
+    // Generar datos para el gráfico comparativo
+    const chartData = useMemo(() => {
+        const data: any[] = [];
+
+        // Crear rango de tipos de interés (de 1% a 7% con paso 0.25%)
+        for (let rate = 1; rate <= 7; rate += 0.25) {
+            const point: any = { rate };
+
+            operations.forEach(op => {
+                // Clonar input y simular con este tipo
+                const input = JSON.parse(JSON.stringify(op.input));
+                input.market.simulatedRate = rate;
+                const res = runSimulation(input);
+
+                point[op.id] = res.adjustedPnL.profitLossPercent; // Usar % para comparar peras con peras
+            });
+
+            data.push(point);
+        }
+
+        return data;
+    }, [operations]);
+
+    return (
+        <div className="flex-1 w-full h-full flex flex-col p-6 overflow-hidden">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                <div>
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        COMPARADOR DE ESTRATEGIAS
+                    </h2>
+                    <p className="text-slate-400 text-sm mt-1">Comparando {operations.length} escenarios</p>
+                </div>
+                <button
+                    onClick={onClose}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm font-semibold transition-colors"
+                >
+                    ✕ Cerrar
+                </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-2 space-y-8">
+
+                {/* Gráfico Comparativo */}
+                <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
+                    <h3 className="text-lg font-semibold text-slate-300 mb-4">Curvas de Rendimiento (%)</h3>
+                    <div className="h-[400px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(100, 116, 139, 0.2)" vertical={false} />
+                                <XAxis
+                                    dataKey="rate"
+                                    stroke="#94a3b8"
+                                    tickFormatter={(v) => `${v}%`}
+                                    label={{ value: 'Tipo de interés', position: 'bottom', fill: '#64748b', offset: 0 }}
+                                />
+                                <YAxis
+                                    stroke="#94a3b8"
+                                    tickFormatter={(v) => `${v}%`}
+                                />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc' }}
+                                    itemStyle={{ fontSize: '12px' }}
+                                    formatter={(value: number) => [`${value.toFixed(1)}%`, 'Rentabilidad']}
+                                    labelFormatter={(value) => `Tipo: ${value}%`}
+                                />
+                                <Legend />
+                                <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="3 3" />
+
+                                {operations.map((op, i) => (
+                                    <Line
+                                        key={op.id}
+                                        type="monotone"
+                                        dataKey={op.id}
+                                        name={op.name}
+                                        stroke={COLORS[i % COLORS.length]}
+                                        strokeWidth={3}
+                                        dot={false}
+                                        connectNulls
+                                    />
+                                ))}
+                            </ComposedChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Tabla Comparativa */}
+                <div className="bg-slate-900/50 rounded-xl overflow-hidden border border-slate-700/50">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left text-slate-300">
+                            <thead className="text-xs text-slate-400 uppercase bg-slate-800/80">
+                                <tr>
+                                    <th className="px-6 py-4">Métrica</th>
+                                    {results.map((item, i) => (
+                                        <th key={item.id} className="px-6 py-4 min-w-[180px]">
+                                            <div className="flex items-center gap-2">
+                                                <div
+                                                    className="w-3 h-3 rounded-full"
+                                                    style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                                                />
+                                                <span className="text-white font-bold">{item.name}</span>
+                                            </div>
+                                            <div className="mt-1 normal-case text-slate-500 font-normal">
+                                                {item.input.warrant.type} · Strike {item.input.warrant.strike}
+                                            </div>
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-700/50">
+                                {/* Inputs */}
+                                <tr className="bg-slate-800/20">
+                                    <td className="px-6 py-3 font-semibold text-slate-400" colSpan={results.length + 1}>Parámetros</td>
+                                </tr>
+                                <tr>
+                                    <td className="px-6 py-3 font-medium">Inversión Total</td>
+                                    {results.map(item => (
+                                        <td key={item.id} className="px-6 py-3 font-mono text-slate-300">
+                                            {formatCurrency(item.result.adjustedPnL.totalInvestment)}
+                                        </td>
+                                    ))}
+                                </tr>
+                                <tr>
+                                    <td className="px-6 py-3 font-medium">Tipo Break-Even</td>
+                                    {results.map(item => (
+                                        <td key={item.id} className="px-6 py-3 font-mono text-slate-300">
+                                            {item.result.breakEvenRate ? `${item.result.breakEvenRate.toFixed(2)}%` : 'N/A'}
+                                        </td>
+                                    ))}
+                                </tr>
+                                <tr>
+                                    <td className="px-6 py-3 font-medium">Theta (diario)</td>
+                                    {results.map(item => (
+                                        <td key={item.id} className="px-6 py-3 font-mono text-red-400">
+                                            {formatCurrency(item.result.theta)}
+                                        </td>
+                                    ))}
+                                </tr>
+
+                                {/* Resultados Simulados */}
+                                <tr className="bg-slate-800/20">
+                                    <td className="px-6 py-3 font-semibold text-slate-400" colSpan={results.length + 1}>
+                                        Escenario Simulado (Tipos actuales: {results[0].input.bond.currentRate}%)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-6 py-3 font-medium">Tipo Simulado</td>
+                                    {results.map(item => (
+                                        <td key={item.id} className="px-6 py-3 font-mono">
+                                            <span className={item.input.market.simulatedRate !== item.input.bond.currentRate ? 'text-amber-400 font-bold' : 'text-slate-500'}>
+                                                {item.input.market.simulatedRate.toFixed(2)}%
+                                            </span>
+                                        </td>
+                                    ))}
+                                </tr>
+                                <tr>
+                                    <td className="px-6 py-3 font-medium">Beneficio / Pérdida (€)</td>
+                                    {results.map(item => {
+                                        const pnl = item.result.adjustedPnL.profitLoss;
+                                        return (
+                                            <td key={item.id} className={`px-6 py-3 font-mono font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                {pnl >= 0 ? '+' : ''}{formatCurrency(pnl)}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                                <tr>
+                                    <td className="px-6 py-3 font-medium">Rentabilidad (%)</td>
+                                    {results.map(item => {
+                                        const pnlPercent = item.result.adjustedPnL.profitLossPercent;
+                                        return (
+                                            <td key={item.id} className={`px-6 py-3 font-mono font-bold ${pnlPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                {pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(1)}%
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};

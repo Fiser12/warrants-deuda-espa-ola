@@ -119,3 +119,14 @@ export interface PayoffDataPoint {
     pnl: number;
     warrantValue: string;
 }
+
+/**
+ * Operación guardada
+ */
+export interface SavedOperation {
+    id: string;
+    name: string;
+    input: SimulatorInput;
+    createdAt: string;
+    updatedAt: string;
+}
