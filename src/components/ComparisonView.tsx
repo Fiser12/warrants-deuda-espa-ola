@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import {
-    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, ReferenceLine, Legend,
+    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart, ReferenceLine, Legend,
 } from 'recharts';
 import { formatCurrency } from '../lib/formatters';
 import type { SavedOperation } from '../lib/types';
@@ -76,44 +76,70 @@ export const ComparisonView = ({ operations, onClose }: ComparisonViewProps) => 
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto pr-2 space-y-8">
+            <div className="flex-1 overflow-y-auto pr-2 space-y-8 scrollbar-thin scrollbar-thumb-slate-700">
 
                 {/* Gráfico Comparativo */}
-                <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50">
-                    <h3 className="text-lg font-semibold text-slate-300 mb-4">Curvas de Rendimiento (%)</h3>
-                    <div className="h-[400px]">
+                <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-700/50 shadow-xl">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-lg font-semibold text-slate-300">Curvas de Rendimiento (%)</h3>
+                        <div className="text-xs text-slate-500 bg-slate-800/50 px-2 py-1 rounded">
+                            Eje X: Tipo de Interés Simulado
+                        </div>
+                    </div>
+
+                    <div className="h-[450px]">
                         <ResponsiveContainer width="100%" height="100%">
-                            <ComposedChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(100, 116, 139, 0.2)" vertical={false} />
+                            <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+                                <defs>
+                                    {operations.map((op, i) => (
+                                        <linearGradient key={`gradient-${op.id}`} id={`color-${op.id}`} x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor={COLORS[i % COLORS.length]} stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor={COLORS[i % COLORS.length]} stopOpacity={0} />
+                                        </linearGradient>
+                                    ))}
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(100, 116, 139, 0.1)" vertical={false} />
                                 <XAxis
                                     dataKey="rate"
-                                    stroke="#94a3b8"
+                                    stroke="#64748b"
                                     tickFormatter={(v) => `${v}%`}
-                                    label={{ value: 'Tipo de interés', position: 'bottom', fill: '#64748b', offset: 0 }}
+                                    tick={{ fontSize: 12 }}
+                                    dy={10}
                                 />
                                 <YAxis
-                                    stroke="#94a3b8"
+                                    stroke="#64748b"
                                     tickFormatter={(v) => `${v}%`}
+                                    tick={{ fontSize: 12 }}
                                 />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc' }}
-                                    itemStyle={{ fontSize: '12px' }}
-                                    formatter={(value: number) => [`${value.toFixed(1)}%`, 'Rentabilidad']}
-                                    labelFormatter={(value) => `Tipo: ${value}%`}
+                                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
+                                    itemStyle={{ fontSize: '13px', paddingTop: '2px', paddingBottom: '2px' }}
+                                    formatter={(value: number, name: string, props: any) => {
+                                        // Buscar el nombre de la operación original si viene por ID
+                                        const opName = operations.find(op => op.id === props.dataKey)?.name || name;
+                                        return [`${value.toFixed(1)}%`, opName];
+                                    }}
+                                    labelFormatter={(value) => `Tipo Simulado: ${value}%`}
                                 />
-                                <Legend />
-                                <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="3 3" />
+                                <Legend
+                                    verticalAlign="top"
+                                    height={36}
+                                    iconType="circle"
+                                    wrapperStyle={{ paddingBottom: '20px' }}
+                                />
+                                <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="3 3" opacity={0.5} />
 
                                 {operations.map((op, i) => (
-                                    <Line
+                                    <Area
                                         key={op.id}
                                         type="monotone"
                                         dataKey={op.id}
                                         name={op.name}
                                         stroke={COLORS[i % COLORS.length]}
                                         strokeWidth={3}
-                                        dot={false}
-                                        connectNulls
+                                        fillOpacity={1}
+                                        fill={`url(#color-${op.id})`}
+                                        activeDot={{ r: 6, strokeWidth: 0 }}
                                     />
                                 ))}
                             </ComposedChart>
@@ -122,7 +148,7 @@ export const ComparisonView = ({ operations, onClose }: ComparisonViewProps) => 
                 </div>
 
                 {/* Tabla Comparativa */}
-                <div className="bg-slate-900/50 rounded-xl overflow-hidden border border-slate-700/50">
+                <div className="bg-slate-900/50 rounded-xl overflow-hidden border border-slate-700/50 shadow-lg">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left text-slate-300">
                             <thead className="text-xs text-slate-400 uppercase bg-slate-800/80">
@@ -177,7 +203,7 @@ export const ComparisonView = ({ operations, onClose }: ComparisonViewProps) => 
                                 {/* Resultados Simulados */}
                                 <tr className="bg-slate-800/20">
                                     <td className="px-6 py-3 font-semibold text-slate-400" colSpan={results.length + 1}>
-                                        Escenario Simulado (Tipos actuales: {results[0].input.bond.currentRate}%)
+                                        Escenario Simulado
                                     </td>
                                 </tr>
                                 <tr>
