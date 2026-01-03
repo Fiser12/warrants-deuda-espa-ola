@@ -69,7 +69,7 @@ export const Header = ({ warrantType, currentInput, currentOutput, onImport }: H
                         WARRANT SIMULATOR
                     </h1>
                     <p className="text-slate-500 mt-1.5 sm:mt-2 text-[11px] sm:text-[13px]">
-                        Deuda Soberana España · Bonos del Estado · {warrantType === 'PUT' ? 'Posición Bajista' : 'Posición Alcista'}
+                        Simulador de warrants sobre bonos · {warrantType === 'PUT' ? 'Posición Bajista' : 'Posición Alcista'}
                     </p>
                 </div>
 

@@ -17,7 +17,7 @@ export const BondParamsCard = ({
 }: BondParamsCardProps) => {
     return (
         <div className="rounded-xl p-5 backdrop-blur-sm transition-all duration-300 bg-gradient-to-br from-slate-800/80 to-slate-900/90 border border-blue-500/15 hover:border-blue-500/30 hover:shadow-[0_8px_32px_rgba(59,130,246,0.1)]">
-            <h3 className="m-0 mb-5 text-sm text-slate-400 tracking-wide">BONO SUBYACENTE · ESPAÑA</h3>
+            <h3 className="m-0 mb-5 text-sm text-slate-400 tracking-wide">BONO SUBYACENTE</h3>
             <div className="grid gap-5">
                 <SliderInput
                     label="Tipo actual (TIR)"
@@ -61,7 +61,7 @@ export const BondParamsCard = ({
                     onChange={onFaceValueChange}
                     formatValue={(v) => `${v.toLocaleString()}€`}
                     colorClass="text-amber-500"
-                    tooltip="Importe que recibes al vencimiento del bono. Los bonos españoles suelen tener nominales de 1.000€."
+                    tooltip="Importe que recibes al vencimiento del bono. El nominal típico suele ser 1.000€."
                 />
             </div>
         </div>

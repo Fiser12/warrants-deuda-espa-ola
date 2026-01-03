@@ -19,7 +19,6 @@ import {
     BondMetrics,
     PnLResult,
     PayoffChart,
-    BrokersFooter,
     MarketParamsCard,
     TimeSimulatorCard,
     TimeDecayChart,
@@ -182,8 +181,6 @@ export default function App() {
                         <TimeDecayChart data={timeDecayData} currentDay={elapsedDays} totalDays={totalDays} />
                     </div>
                 </div>
-
-                <BrokersFooter />
             </div>
         </div>
     );
