@@ -9,3 +9,5 @@ export { PnLResult } from './PnLResult';
 export { PayoffChart } from './PayoffChart';
 export { BrokersFooter } from './BrokersFooter';
 export { MarketParamsCard } from './MarketParamsCard';
+export { TimeSimulatorCard } from './TimeSimulatorCard';
+export { TimeDecayChart } from './TimeDecayChart';

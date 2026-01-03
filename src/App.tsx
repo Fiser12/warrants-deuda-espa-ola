@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import type { WarrantType } from './lib/types';
-import { useWarrantCalculations, usePayoffData } from './hooks';
+import { calcWarrantValue, calcBondPrice } from './lib/financial';
+import { useWarrantCalculations, usePayoffData, useTimeDecayData } from './hooks';
 import {
     Header,
     WarrantTypeSelector,
@@ -13,6 +14,8 @@ import {
     PayoffChart,
     BrokersFooter,
     MarketParamsCard,
+    TimeSimulatorCard,
+    TimeDecayChart,
 } from './components';
 
 export default function App() {
@@ -29,15 +32,33 @@ export default function App() {
     const [simulatedRate, setSimulatedRate] = useState(4.0);
     const [riskFreeRate, setRiskFreeRate] = useState(3.0);
     const [faceValue, setFaceValue] = useState(100);
+    const [elapsedDays, setElapsedDays] = useState(0);
+
+    const totalDays = Math.round(expiry * 365);
+    const remainingYears = Math.max(0, (totalDays - elapsedDays) / 365);
+
+    // Calcular theta (pérdida de valor por día)
+    const theta = useMemo(() => {
+        const bondPrice = calcBondPrice(faceValue, bondCoupon / 100, currentRate / 100, bondMaturity);
+        const isPut = warrantType === 'PUT';
+        const valueNow = calcWarrantValue(bondPrice, strike, volatility, remainingYears, riskFreeRate / 100, isPut);
+        const valueTomorrow = calcWarrantValue(bondPrice, strike, volatility, Math.max(0, remainingYears - 1 / 365), riskFreeRate / 100, isPut);
+        return (valueTomorrow - valueNow) * quantity * ratio;
+    }, [faceValue, bondCoupon, currentRate, bondMaturity, warrantType, strike, volatility, remainingYears, riskFreeRate, quantity, ratio]);
 
     const calculations = useWarrantCalculations({
-        warrantType, strike, premium, ratio, expiry, volatility, quantity,
+        warrantType, strike, premium, ratio, expiry: remainingYears, volatility, quantity,
         currentRate, bondCoupon, bondMaturity, simulatedRate, riskFreeRate, faceValue,
     });
 
     const payoffData = usePayoffData({
-        warrantType, strike, premium, ratio, expiry, volatility, quantity,
+        warrantType, strike, premium, ratio, expiry: remainingYears, volatility, quantity,
         bondCoupon, bondMaturity, faceValue,
+    });
+
+    const timeDecayData = useTimeDecayData({
+        warrantType, strike, volatility, expiryYears: expiry, riskFreeRate,
+        currentRate, bondCoupon, bondMaturity, faceValue,
     });
 
     return (
@@ -70,12 +91,19 @@ export default function App() {
 
                     <div className="flex flex-col gap-5">
                         <ScenarioSimulator simulatedRate={simulatedRate} currentRate={currentRate} onChange={setSimulatedRate} />
+                        <TimeSimulatorCard
+                            expiryYears={expiry}
+                            elapsedDays={elapsedDays}
+                            theta={theta}
+                            onElapsedDaysChange={setElapsedDays}
+                        />
                         <BondMetrics currentBondPrice={calculations.currentBondPrice} simulatedBondPrice={calculations.simulatedBondPrice} />
                         <PnLResult
                             totalInvestment={calculations.totalInvestment} simulatedPosition={calculations.simulatedPosition}
                             profitLoss={calculations.profitLoss} profitLossPercent={calculations.profitLossPercent}
                         />
                         <PayoffChart data={payoffData} currentRate={currentRate} />
+                        <TimeDecayChart data={timeDecayData} currentDay={elapsedDays} totalDays={totalDays} />
                     </div>
                 </div>
 
