@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { WarrantType, SimulatorInput, SimulatorOutput, SavedOperation } from '../lib/types';
+import type { WarrantType, SimulatorInput, SimulatorOutput } from '../lib/types';
 import { runSimulation } from '../lib/simulator';
 import {
     useWarrantCalculations,

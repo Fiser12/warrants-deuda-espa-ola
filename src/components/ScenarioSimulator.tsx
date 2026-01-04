@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react';
 
 interface ScenarioSimulatorProps {
     simulatedRate: number; // This is now Risk Free Rate (BCE)
-    currentRate: number;   // Should be some reference?
     creditSpread: number;  // bps
     onChange: (value: number) => void;
 }
 
-export const ScenarioSimulator = ({ simulatedRate, currentRate, creditSpread, onChange }: ScenarioSimulatorProps) => {
+export const ScenarioSimulator = ({ simulatedRate, creditSpread, onChange }: ScenarioSimulatorProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [inputValue, setInputValue] = useState(String(simulatedRate));
 

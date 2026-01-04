@@ -150,7 +150,6 @@ export default function App() {
                             <div className="flex flex-col gap-4 sm:gap-5">
                                 <ScenarioSimulator
                                     simulatedRate={sim.riskFreeRate}
-                                    currentRate={3.0}
                                     onChange={sim.setRiskFreeRate}
                                     creditSpread={sim.creditSpread}
                                 />
