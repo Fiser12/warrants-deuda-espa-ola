@@ -5,3 +5,5 @@ export { useCosts } from './useCosts';
 export { useTheta } from './useTheta';
 export { useBreakEven } from './useBreakEven';
 export { useSavedOperations } from './useSavedOperations';
+export { useMarketDataSync } from './useMarketDataSync';
+export { useSimulationState } from './useSimulationState';

@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { SliderInput } from './SliderInput';
-import { useSettings } from '../context/SettingsContext';
-import { MarketDataService } from '../lib/marketData';
+import { useMarketDataSync } from '../hooks';
 
 interface BondParamsCardProps {
     currentRate: number;
@@ -18,40 +16,12 @@ export const BondParamsCard = ({
     currentRate, bondCoupon, bondMaturity, faceValue,
     onCurrentRateChange, onBondCouponChange, onBondMaturityChange, onFaceValueChange,
 }: BondParamsCardProps) => {
-    const { apiKey, hasApiKey } = useSettings();
-    const [isLoading, setIsLoading] = useState(false);
-    const [lastUpdated, setLastUpdated] = useState<string | null>(() => {
-        return localStorage.getItem('av_last_sync_date');
-    });
 
-    // Default maturity 10year, country US
-    const [selectedBenchmark, setSelectedBenchmark] = useState<'3month' | '2year' | '5year' | '10year' | '30year'>('10year');
-    const [selectedCountry, setSelectedCountry] = useState<'us' | 'es' | 'de' | 'eu' | 'fr' | 'it' | 'nl'>('us');
-
-    const handleSync = async () => {
-        // US requires API Key, others do not
-        if (selectedCountry === 'us' && !hasApiKey) {
-            alert('Para EEUU (Alpha Vantage) necesitas configurar tu API Key en los ajustes (⚙️). Europa/ECB es gratuito.');
-            return;
-        }
-
-        setIsLoading(true);
-        const service = new MarketDataService(selectedCountry === 'us' ? apiKey : 'skipped');
-
-        try {
-            const result = await service.fetchBondYield(selectedBenchmark, selectedCountry);
-
-            onCurrentRateChange(result.value);
-
-            const dateStr = new Date().toLocaleString();
-            setLastUpdated(`${dateStr} (${selectedCountry.toUpperCase()})`);
-            localStorage.setItem('av_last_sync_date', dateStr);
-        } catch (error: any) {
-            alert(`Error al sincronizar: ${error.message}`);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const {
+        selectedCountry, setSelectedCountry,
+        selectedBenchmark, setSelectedBenchmark,
+        isLoading, lastUpdated, sync, hasApiKey
+    } = useMarketDataSync(onCurrentRateChange);
 
     return (
         <div className="rounded-xl p-5 backdrop-blur-sm transition-all duration-300 bg-gradient-to-br from-slate-800/80 to-slate-900/90 border border-blue-500/15 hover:border-blue-500/30 hover:shadow-[0_8px_32px_rgba(59,130,246,0.1)]">
@@ -105,7 +75,7 @@ export const BondParamsCard = ({
                         </select>
 
                         <button
-                            onClick={handleSync}
+                            onClick={sync}
                             disabled={isLoading}
                             className={`text-[10px] uppercase font-bold px-2 py-1 rounded border transition-colors ${(selectedCountry !== 'us' || hasApiKey)
                                 ? 'bg-blue-900/30 border-blue-500/30 text-blue-400 hover:bg-blue-900/50 hover:text-blue-300 cursor-pointer'
